@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Peeps</title>
+  </head>
+  <body>
+    <h1>Peeps</h1>
+
+    <p>
+      <span id="myUsernameSpan"></span
+      ><input type="text" id="myUsernameInput" />
+    </p>
+
+    <br />
+
+    <ul id="friendsListUl"></ul>
+
+    <p><button id="login">Login</button></p>
+    <p><button id="logout">Logout</button></p>
+  </body>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.dev.js"></script>
+
+  <script>
+    var socket = io();
+
+    var loginButton = document.getElementById("login");
+    var logoutButton = document.getElementById("logout");
+    var myUsernameInput = document.getElementById("myUsernameInput");
+    var myUsernameSpan = document.getElementById("myUsernameSpan");
+    var friendsListUl = document.getElementById("friendsListUl");
+
+    var loggedIn = false;
+    var myUsername = "";
+
+    socket.on("usersUpdates", function(msg) {
+      var activeUsers = msg.online;
+
+      // msg.online.forEach(user => console.log(user));
+    });
+
+    logoutButton.style.display = "none";
+
+    loginButton.addEventListener("click", function() {
+      myUsername = myUsernameInput.value;
+      myUsernameSpan.innerHTML = myUsername;
+      myUsernameInput.style.display = "none";
+      loginButton.style.display = "none";
+      logoutButton.style.display = "initial";
+
+      socket.emit("login", {
+        name: myUsernameInput.value
+      });
+    });
+
+    logoutButton.addEventListener("click", function() {
+      socket.emit("logout", {
+        name: myUsername
+      });
+
+      myUsername = "";
+      myUsernameSpan.innerHTML = "";
+      myUsernameInput.value = "";
+      myUsernameInput.style.display = "initial";
+      loginButton.style.display = "initial";
+      logoutButton.style.display = "none";
+    });
+  </script>
+</html>
